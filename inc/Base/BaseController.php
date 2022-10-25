@@ -7,6 +7,7 @@ class BaseController
     public $plugin_path;
     public $plugin_url;
     public $plugin;
+    public const CW_MANAGER_UPLOADER_STOCK_TABLE = "cw_manager_upload_stock";
     
     public function __construct()
     {

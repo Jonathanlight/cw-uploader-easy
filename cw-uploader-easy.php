@@ -1,6 +1,6 @@
 <?php
 /*
- Plugin Name: CW Uploader Easy
+ Plugin Name: Manager Upload Stock
  Plugin URI: https://localhost.dev/
  Description: Upload un fichier pour l'alimentation en base de donnée 
  Version: 1.0.0

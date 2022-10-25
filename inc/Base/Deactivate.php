@@ -2,7 +2,9 @@
 
 namespace Inc\Base;
 
- class Deactivate 
+use \Inc\Base\BaseController;
+
+ class Deactivate extends BaseController
  {
      public static function deactivate() 
      {
