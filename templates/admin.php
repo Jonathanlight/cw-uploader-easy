@@ -1,12 +1,11 @@
 <?php $link_box = dirname(__DIR__) . '/data/tmp/state/AMD05/7_1100001/index.php'; include_once $link_box; ?>
+
 <?php
     global $wpdb;
     $table = $wpdb->prefix . "wc_product_meta_lookup";
     $table_postmeta = $wpdb->prefix . "postmeta";
     $table_cw_manager_upload_stock = $wpdb->prefix . "cw_manager_upload_stock";
     $row_stocks = 0;
-
-    var_dump($tmp_state );
 
     function refresh_array_stocks(array $tabs, string $col_1, string $col_2) {
         $tabs_format = [];
@@ -53,23 +52,19 @@
                 <?php
                     $csv = array();
 
-                    if(isset($_POST['but_submit'])){
+                    if(isset($_POST[SUBMITED_SERV])){
 
-                        if($_FILES['cw_uploader_easy_file']['name'] != ''){
-                            $uploadedfile = $_FILES['cw_uploader_easy_file'];
+                        if($_FILES[WP_SOURCE_FILE]['name'] != ''){
+                            $uploadedfile = $_FILES[WP_SOURCE_FILE];
                             $upload_overrides = array( 'test_form' => false );
-
-                            $name = $_FILES['cw_uploader_easy_file']['name'];
-                            $extExplode = explode('.', $_FILES['cw_uploader_easy_file']['name']);
+                            $name = $_FILES[WP_SOURCE_FILE]['name'];
+                            $extExplode = explode('.', $_FILES[WP_SOURCE_FILE]['name']);
                             $extOperation = end($extExplode);
                             $ext = strtolower($extOperation);
-                            $type = $_FILES['cw_uploader_easy_file']['type'];
-                            $tmpName = $_FILES['cw_uploader_easy_file']['tmp_name'];
-
+                            $type = $_FILES[WP_SOURCE_FILE]['type'];
+                            $tmpName = $_FILES[WP_SOURCE_FILE]['tmp_name'];
                             $movefile = wp_handle_upload( $uploadedfile, $upload_overrides );
-
                             $imageurl = "";
-
                             $DOCUMENT_ROOT = $_SERVER['DOCUMENT_ROOT'];
 
                             if ( $movefile && ! isset( $movefile['error'] ) ) {
@@ -84,8 +79,8 @@
                                         while(($data = fgetcsv($handle, 1000, ';')) !== FALSE) {
 
                                             $col_count = count($data);
-                                            $csv[$row]['reference'] = $data[0];
-                                            $csv[$row]['stock'] = $data[1];
+                                            $csv[$row][WP_REFERENCE] = $data[0];
+                                            $csv[$row][WP_STOCK] = $data[1];
 
                                             $row++;
                                         }
@@ -93,12 +88,12 @@
                                     }
                                 }
 
-                                $csvList = refresh_array_stocks($csv, 'reference', 'stock');
+                                $csvList = refresh_array_stocks($csv, WP_REFERENCE, WP_STOCK);
 
                                 foreach($csvList as $p) {
 
-                                    $_sku = $p['reference'];
-                                    $_stock = $p['stock'];
+                                    $_sku = $p[WP_REFERENCE];
+                                    $_stock = $p[WP_STOCK];
 
                                     // fixed stock
                                     $wpdb->update(
@@ -204,7 +199,7 @@
                     <table>
                         <tr>
                             <td>
-                                <?php $link_box = dirname(__DIR__) . '/data/tmp/state/AMD04/5_1110100/index.php'; include_once $link_box; ?>
+                                <?php $link_box = dirname(__DIR__) . WP_PATH_4_5; include_once $link_box; ?>
                             </td>
 
                         </tr>
