@@ -12,5 +12,4 @@
     $tmp_state = $_COOKIE["TMP_STATE"];
 
     const WP_PATH_4_5 = '/data/tmp/state/AMD04/5_1110100/index.php';
-    sleep(50);
 ?>

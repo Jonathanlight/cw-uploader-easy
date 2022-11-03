@@ -6,6 +6,7 @@
     $table_postmeta = $wpdb->prefix . "postmeta";
     $table_cw_manager_upload_stock = $wpdb->prefix . "cw_manager_upload_stock";
     $row_stocks = 0;
+    $DOCUMENT_ROOT = $_SERVER['DOCUMENT_ROOT'];
 
     function refresh_array_stocks(array $tabs, string $col_1, string $col_2) {
         $tabs_format = [];
@@ -176,10 +177,9 @@
 
                                 echo '<div class="form-success">';
                                 echo '<span> Fichier uploader avec succès</span><br/>';
-                                echo "<span> URL : <a href='$imageurl'>$imageurl</a></span><br/>";
+                                //echo "<span> URL : <a href='$imageurl'>$imageurl</a></span><br/>";
                                 echo '<hr/><br/>';
-                                echo '<span>Les stocks sont mis à jour </span><br/>';
-                                
+                                echo '<span>Les stocks sont mises à jour </span><br/>';
                                 echo '</div>';
 
                                 $row_stocks = get_query_stock($wpdb, 10);
@@ -210,7 +210,10 @@
 		                    </td>
 	                    </tr>
                         <tr>
-                            <td><input type='submit' name='but_submit' value='Valider le stock' class="cw_uploader_easy_button"></td>
+                            <td>
+                                <input type='submit' name='but_submit' value='Valider le stock' class="cw_uploader_easy_button">
+                                <img src="<?= $this->plugin_url . 'assets/images/spinner.svg' ?>" width="150" class="cw_uploader_easy_button_spinner" />
+                            </td>
                         </tr>
                     </table>
                 </form>
@@ -226,10 +229,10 @@
                     </tr>
                     <?php foreach($row_stocks as $stock) { ?>
                         <tr>
-                            <td> <?php echo $stock->id; ?> </td>
+                            <td><?= $stock->id; ?></td>
                             <td><i class="fa fa-database"></i></td>
-                            <td><?php echo ucfirst($stock->author_name); ?> </td>
-                            <td><?php echo $stock->created_at; ?> </td>
+                            <td><?= ucfirst($stock->author_name); ?></td>
+                            <td><?= $stock->created_at; ?> </td>
                         </tr>
                     <?php } ?>
                 </table>
