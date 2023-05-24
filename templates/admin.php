@@ -3,6 +3,7 @@
     const SUBMITED_SERV = 'but_submit';
     const WP_REFERENCE = 'reference';
     const WP_STOCK = 'stock';
+    const WP_PRICE = 'prix';
     const WP_SOURCE_FILE = 'cw_uploader_easy_file';
 
     $table = $wpdb->prefix . "wc_product_meta_lookup";
@@ -54,6 +55,7 @@
                 <?php settings_errors(); ?>
 
                 <?php
+                    // New Array CSV               
                     $csv = array();
 
                     if(isset($_POST[SUBMITED_SERV])){
@@ -85,6 +87,7 @@
                                             $col_count = count($data);
                                             $csv[$row][WP_REFERENCE] = $data[0];
                                             $csv[$row][WP_STOCK] = $data[1];
+                                            $csv[$row][WP_PRICE] = $data[2];
 
                                             $row++;
                                         }
@@ -96,8 +99,10 @@
 
                                 foreach($csvList as $p) {
 
+                                    // array csv
                                     $_sku = $p[WP_REFERENCE];
                                     $_stock = $p[WP_STOCK];
+                                    $_price = $p[WP_PRICE];
 
                                     // fixed stock
                                     $wpdb->update(
@@ -128,44 +133,40 @@
 
                                         $post_id = $result[0]->product_id;
 
+                                        // fixed price min
+                                        $wpdb->update($table, 
+                                            array('post_id' => $post_id), array( 'min_price' => $_price ) 
+                                        );
+
+                                        // fixed price max
+                                        $wpdb->update($table, 
+                                            array('post_id' => $post_id), array( 'max_price' => $_price ) 
+                                        );
+
+                                        // update price
                                         $wpdb->update(
-                                            $table_postmeta, 
-                                            array( 'meta_value' => $_stock), 
-                                            array( 
-                                                'post_id' => $post_id,
-                                                'meta_key' => '_stock',
-                                            ) 
+                                            $table_postmeta, array( 'meta_value' => $_price), array('post_id' => $post_id, 'meta_key' => '_price',) 
+                                        );
+
+                                        // update stock
+                                        $wpdb->update(
+                                            $table_postmeta, array( 'meta_value' => $_stock), array('post_id' => $post_id, 'meta_key' => '_stock',) 
                                         );
 
                                         // fixed stock manager
                                         $wpdb->update(
-                                            $table_postmeta, 
-                                            array( 'meta_value' => 'yes'), 
-                                            array( 
-                                                'post_id' => $post_id,
-                                                'meta_key' => '_manage_stock',
-                                            ) 
+                                            $table_postmeta, array( 'meta_value' => 'yes'), array('post_id' => $post_id,'meta_key' => '_manage_stock',) 
                                         );
 
                                         if ($_stock > 0) {
                                             // instock
                                             $wpdb->update(
-                                                $table_postmeta, 
-                                                array( 'meta_value' => 'instock'), 
-                                                array( 
-                                                    'post_id' => $post_id,
-                                                    'meta_key' => '_stock_status',
-                                                ) 
+                                                $table_postmeta, array( 'meta_value' => 'instock'), array('post_id' => $post_id,'meta_key' => '_stock_status',) 
                                             );
                                         } else {
                                             // outofstock 
                                             $wpdb->update(
-                                                $table_postmeta, 
-                                                array( 'meta_value' => 'outofstock'), 
-                                                array( 
-                                                    'post_id' => $post_id,
-                                                    'meta_key' => '_stock_status',
-                                                ) 
+                                                $table_postmeta, array( 'meta_value' => 'outofstock'), array('post_id' => $post_id, 'meta_key' => '_stock_status',) 
                                             );
                                         }
                                     }
