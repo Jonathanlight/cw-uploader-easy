@@ -3,7 +3,7 @@
  Plugin Name: Manager Upload Stock
  Plugin URI: https://localhost.dev/
  Description: Upload un fichier pour l'alimentation en base de donnée 
- Version: 1.0.0
+ Version: 4.1.1
  Author: Jonathan Kablan
  Author URI: https://localhost.dev
  Text Domain: Upload de fichier

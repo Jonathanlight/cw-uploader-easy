@@ -1,7 +1,10 @@
-<?php $link_box = dirname(__DIR__) . '/data/tmp/state/AMD05/7_1100001/index.php'; include_once $link_box; ?>
-
-<?php
+<?php 
     global $wpdb;
+    const SUBMITED_SERV = 'but_submit';
+    const WP_REFERENCE = 'reference';
+    const WP_STOCK = 'stock';
+    const WP_SOURCE_FILE = 'cw_uploader_easy_file';
+
     $table = $wpdb->prefix . "wc_product_meta_lookup";
     $table_postmeta = $wpdb->prefix . "postmeta";
     $table_cw_manager_upload_stock = $wpdb->prefix . "cw_manager_upload_stock";
@@ -199,16 +202,17 @@
                     <table>
                         <tr>
                             <td>
-                                <?php $link_box = dirname(__DIR__) . WP_PATH_4_5; include_once $link_box; ?>
+                                <div id="cw_uploader_easy">
+                                    <label for="cw_uploader_easy_inputTag">
+                                        Uploader votre source de fichier : <br/>
+                                        <i class="fa fa-2x fa-file"></i>
+                                        <input id="cw_uploader_easy_inputTag" type="file" accept=".csv" name="cw_uploader_easy_file"/>
+                                        <br/>
+                                        <span id="cw_uploader_easy_imageName"></span>
+                                    </label>
+                                </div>
                             </td>
-
                         </tr>
-	                    <tr>
-		                    <td>
-			                    <p>Clé d'activation : <?= $keygen_serv ?> </p>
-			                    <p>Valable jusqu'au : <?= $tmp_timestamp ?></p>
-		                    </td>
-	                    </tr>
                         <tr>
                             <td>
                                 <input type='submit' name='but_submit' value='Valider le stock' class="cw_uploader_easy_button">
