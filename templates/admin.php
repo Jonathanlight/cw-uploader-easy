@@ -12,22 +12,69 @@
     $row_stocks = 0;
     $DOCUMENT_ROOT = $_SERVER['DOCUMENT_ROOT'];
 
-    function refresh_array_stocks(array $tabs, string $col_1, string $col_2) {
+    function splitByArrayFormat(array $tabs_format) {
+        $arrayFormat = [];
+        foreach($tabs_format as $key => $format) {
+            $arrayTmp = explode(",", $key);
+            array_push($arrayFormat, [
+                WP_REFERENCE => $arrayTmp[0],
+                WP_STOCK => $format[WP_STOCK], // $arrayTmp[1],
+                WP_PRICE => $arrayTmp[2]
+            ]);
+        }
+
+        return $arrayFormat;
+    }
+
+    function splitByStringFormat(string $tabs_format_string) {
+        $arrayFormat = [];
+        $arrayTmp = explode(",", $tabs_format_string);
+
+        $arrayFormat = [
+            WP_REFERENCE => $arrayTmp[0],
+            WP_STOCK => $arrayTmp[1],
+            WP_PRICE => $arrayTmp[2]
+        ];
+        
+        return $arrayFormat;
+    }
+
+    function refresh_array_stocks(array $tabs, string $col_1, string $col_2, string $col_3) {
         $tabs_format = [];
         $refresh_stocks = [];
     
-        foreach($tabs as $k => $v) {
+        foreach($tabs as $k => $v) {    
             $refresh_stocks[$v[$col_1]][]=$v;
         }
-    
+
         foreach($refresh_stocks as $key => $duplicates ) {
             foreach ($duplicates as $keySecond => $data) { 
                 $tabs_format[$key][$col_1] = $key;        
-                $tabs_format[$key][$col_2] = array_sum(array_column($refresh_stocks[$key], $col_2));
+                $tabs_format[$key][$col_2] = count($duplicates); //array_sum(array_column($refresh_stocks[$key], $col_2));
+                $tabs_format[$key][$col_3] = $data[WP_PRICE];
             }
         }
-    
-        return $tabs_format;
+
+        //var_dump($tabs_format);die;
+
+        array_shift($tabs_format);
+
+        $arrayFormat = [];
+        foreach($tabs_format as $key => $format) {
+            $arrayTmp = explode(",", $key);
+
+            $formatStatement = $format[WP_PRICE];
+            $chaine_sans_guillemets = str_replace('"', '', $formatStatement);
+            $prix_flottant = floatval($chaine_sans_guillemets);
+
+            array_push($arrayFormat, [
+                WP_REFERENCE => $arrayTmp[0],
+                WP_STOCK => (int)$format[WP_STOCK],
+                WP_PRICE => $prix_flottant
+            ]);
+        }
+
+        return $arrayFormat;
     }
 
     function get_query_stock($wpdb, $limit = 10) {
@@ -46,15 +93,12 @@
         <div class="cw_uploader_stock-section-header">
             <h1 class="cw_uploader_stock-section-header-layout"> 
                 Manager Upload Stock | Vue d'ensemble 
-            </h1>
-
-	        <hr>
-            
+            </h1> <hr>
         </div>
         <div class="cw_uploader_stock-section-header">
-                <?php settings_errors(); ?>
-
                 <?php
+                    settings_errors();
+
                     // New Array CSV               
                     $csv = array();
 
@@ -85,17 +129,20 @@
                                         while(($data = fgetcsv($handle, 1000, ';')) !== FALSE) {
 
                                             $col_count = count($data);
-                                            $csv[$row][WP_REFERENCE] = $data[0];
-                                            $csv[$row][WP_STOCK] = $data[1];
-                                            $csv[$row][WP_PRICE] = $data[2];
+
+                                            $datas = splitByStringFormat($data[0]);
+
+                                            $csv[$row][WP_REFERENCE] = $datas[WP_REFERENCE]; //here 
+                                            $csv[$row][WP_STOCK] = $datas[WP_STOCK];
+                                            $csv[$row][WP_PRICE] = $datas[WP_PRICE];
 
                                             $row++;
                                         }
                                         fclose($handle);
                                     }
                                 }
-
-                                $csvList = refresh_array_stocks($csv, WP_REFERENCE, WP_STOCK);
+                                
+                                $csvList = refresh_array_stocks($csv, WP_REFERENCE, WP_STOCK, WP_PRICE);
 
                                 foreach($csvList as $p) {
 
@@ -134,18 +181,27 @@
                                         $post_id = $result[0]->product_id;
 
                                         // fixed price min
-                                        $wpdb->update($table, 
-                                            array('post_id' => $post_id), array( 'min_price' => $_price ) 
+                                        $wpdb->update(
+                                            $table, array('min_price' => $_price), array('product_id' => $post_id) 
                                         );
 
                                         // fixed price max
-                                        $wpdb->update($table, 
-                                            array('post_id' => $post_id), array( 'max_price' => $_price ) 
+                                        $wpdb->update(
+                                            $table, array('max_price' => $_price), array('product_id' => $post_id) 
                                         );
 
                                         // update price
                                         $wpdb->update(
                                             $table_postmeta, array( 'meta_value' => $_price), array('post_id' => $post_id, 'meta_key' => '_price',) 
+                                        );
+
+                                        //update regular price _regular_price
+                                        $wpdb->update(
+                                            $table_postmeta, array( 'meta_value' => $_price), array('post_id' => $post_id, 'meta_key' => '_regular_price',) 
+                                        );
+                                        //update price promo _sale_price
+                                        $wpdb->update(
+                                            $table_postmeta, array( 'meta_value' => $_price), array('post_id' => $post_id, 'meta_key' => '_sale_price',) 
                                         );
 
                                         // update stock
