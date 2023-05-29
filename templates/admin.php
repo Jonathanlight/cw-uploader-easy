@@ -55,8 +55,6 @@
             }
         }
 
-        //var_dump($tabs_format);die;
-
         array_shift($tabs_format);
 
         $arrayFormat = [];
@@ -199,10 +197,11 @@
                                         $wpdb->update(
                                             $table_postmeta, array( 'meta_value' => $_price), array('post_id' => $post_id, 'meta_key' => '_regular_price',) 
                                         );
+
                                         //update price promo _sale_price
-                                        $wpdb->update(
-                                            $table_postmeta, array( 'meta_value' => $_price), array('post_id' => $post_id, 'meta_key' => '_sale_price',) 
-                                        );
+                                        //$wpdb->update(
+                                           // $table_postmeta, array( 'meta_value' => $_price), array('post_id' => $post_id, 'meta_key' => '_sale_price',) 
+                                        //);
 
                                         // update stock
                                         $wpdb->update(
